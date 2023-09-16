@@ -2,6 +2,8 @@ import pygame, math, time
 from random import choices, choice, randint
 from sys import exit
 
+# Hello
+
 class Cat(pygame.sprite.Sprite): # Cat sprite!
     def __init__(self):
         super().__init__()
@@ -21,7 +23,7 @@ class Cat(pygame.sprite.Sprite): # Cat sprite!
 
         self.gravity = 0
         self.velocity = 0
-        self.acceleration = 0.02
+        self.acceleration = 0.015
         self.is_moving = False
         
 
@@ -88,7 +90,7 @@ class Cat(pygame.sprite.Sprite): # Cat sprite!
         self.add_gravity()
         self.animate()
         
-class Obstacles(pygame.sprite.Sprite):
+class Obstacles(pygame.sprite.Sprite): # Stores Obstacle Types and Speed!
     def __init__(self, object):
         super().__init__()
     
@@ -128,7 +130,7 @@ class Obstacles(pygame.sprite.Sprite):
             y_oscillation = 25 * math.sin(0.004 * pygame.time.get_ticks() + phase_to_radians)
             self.rect.y = 180 + y_oscillation
 
-def show_score():
+def show_score(): # Shows our Score (Once Score > 0)!
     global current_time
     current_time = (pygame.time.get_ticks() - start_time) // 1000
     
@@ -143,7 +145,7 @@ def show_score():
 
     return current_time
 
-def collisions():
+def collisions(): # Allows objects to collide!
     if pygame.sprite.spritecollide(player.sprite, obstacle_group, False):
         obstacle_group.empty()
         player.sprite.reset_position()
@@ -151,7 +153,7 @@ def collisions():
         return False
     return True
         
-def music_loop():
+def music_loop(): # Randomly loop through music selection!
     if not pygame.mixer.music.get_busy():
             
             global prev_song, bg_music
@@ -162,8 +164,18 @@ def music_loop():
             pygame.mixer.music.play()
             pygame.mixer.music.set_volume(0.2)
 
-# == SETUP ==
+def draw_background(): # Displays the background layers!
+    
+    screen.blit(bg_surface, (0, 0))
 
+    for i in range(tiles): screen.blit(city_surfaces[0], (i * bg_surface_width - city_scroll1, 0))
+    for i in range(tiles): screen.blit(city_surfaces[1], (i * bg_surface_width - city_scroll2, 0))
+    for i in range(tiles): screen.blit(city_surfaces[2], (i * bg_surface_width - city_scroll3, 0))
+
+    # Draw Concrete Surface
+    for i in range(tiles): screen.blit(concrete_surface, (i * concrete_surface_width - concrete_scroll, 350))
+    
+# == SETUP ==
 pygame.init()
 
 screen_width = 800
@@ -174,7 +186,6 @@ pygame.display.set_caption('Zoomies!')
 clock = pygame.time.Clock()
 font = pygame.font.Font('font/ubuntu.medium.ttf', 35)
 game_active = False
-
 
 start_time = 0
 score = 0
@@ -189,6 +200,8 @@ pygame.mixer.music.play()
 pygame.mixer.music.set_volume(0.2)
 
 # == SURFACES ==
+title_surface = pygame.image.load('logo2.png').convert_alpha()
+
 concrete_surface = pygame.image.load('concrete.png').convert()
 concrete_surface_width = concrete_surface.get_width()
 concrete_surface_rect = concrete_surface.get_rect(center = (400, 375))
@@ -248,26 +261,20 @@ while True:
         music_loop()
 
         # Draw Scrolling Background
-        screen.blit(bg_surface, (0, 0))
-
-        for i in range(tiles): screen.blit(city_surfaces[0], (i * bg_surface_width - city_scroll1, 0))
-        for i in range(tiles): screen.blit(city_surfaces[1], (i * bg_surface_width - city_scroll2, 0))
-        for i in range(tiles): screen.blit(city_surfaces[2], (i * bg_surface_width - city_scroll3, 0))
-
-        # Draw Concrete Surface
-        for i in range(tiles): screen.blit(concrete_surface, (i * concrete_surface_width - concrete_scroll, 350))
+        draw_background()
         
         # Show our score
         score = show_score()
 
         # Scroll Background
         bg_scroll += 0.1
-        city_scroll1 += 0.2
-        city_scroll2 += 0.22
-        city_scroll3 += 0.24
-        concrete_scroll_speed = 2 + (((pygame.time.get_ticks() - start_time) // 1000) // 15) * 0.2 
+        city_scroll1 += 0.2  # v
+        city_scroll2 += 0.22 # Different values to create parallax effect!
+        city_scroll3 += 0.24 # ^
+        concrete_scroll_speed = 2 + (((pygame.time.get_ticks() - start_time) // 1000) // 15) * 0.2 # Allows concrete image to move faster as the time increases
         concrete_scroll += concrete_scroll_speed
 
+        # Reset Scroll
         if bg_scroll >= bg_surface_width: bg_scroll = 0
         if city_scroll1 >= bg_surface_width: city_scroll1 = 0
         if city_scroll2 >= bg_surface_width: city_scroll2 = 0
@@ -312,6 +319,10 @@ while True:
         # Controllable Cat!
         player.draw(screen)
         player.update()
+
+        # Logo
+        title_surface_rect = title_surface.get_rect(center = (400, 120 + 10 * math.sin(0.004 * pygame.time.get_ticks()) ))
+        screen.blit(title_surface, title_surface_rect)
 
     # == SCREEN UPDATE ==
     pygame.display.update()
