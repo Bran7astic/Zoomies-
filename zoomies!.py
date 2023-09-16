@@ -29,6 +29,7 @@ class Cat(pygame.sprite.Sprite): # Cat sprite!
         
         keys = pygame.key.get_pressed()
         if game_active:
+            
             self.is_moving = True
             self.velocity = 0
             if keys[pygame.K_SPACE] and self.rect.bottom >= 370:
@@ -264,7 +265,6 @@ while True:
         city_scroll1 += 0.2
         city_scroll2 += 0.22
         city_scroll3 += 0.24
-
         concrete_scroll_speed = 2 + (((pygame.time.get_ticks() - start_time) // 1000) // 15) * 0.2 
         concrete_scroll += concrete_scroll_speed
 
@@ -285,8 +285,6 @@ while True:
         # Collision
         game_active = collisions()
 
-        # Speed Increase
-            
 
     # == TITLE SCREEN ==
     else:
